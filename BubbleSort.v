@@ -1,4 +1,4 @@
-(*
+From Sorting Require Import SortingHeader.
 
 Local Obligation Tactic := 
   simpl in *; Tactics.program_simplify;
@@ -33,11 +33,6 @@ bubble_up (cons x (cons y t)) :=
         (* x >= y, so we need to swap *)
         y :: bubble_up (x :: t).
 
-Ltac2 Notation "neqbsimpl" :=
-  try (rewrite Nat.eqb_eq in * ); ff;
-  try (rewrite Nat.eqb_neq in * ); ff;
-  try (rewrite Nat.ltb_irrefl in * ); ff.
-
 Lemma bubble_up_count_invariant : forall l, 
   forall x, count x l = count x (bubble_up l).
 Proof.
@@ -61,16 +56,6 @@ Proof.
     all: try (rewrite <- H in *; ff; neqbsimpl).
     all: try (rewrite <- H0 in *; ff; neqbsimpl).
 Qed.
-
-Fixpoint min (l : list nat) : option nat :=
-  match l with
-  | nil => None
-  | h :: t =>
-    match min t with
-    | None => Some h
-    | Some v => Some (Nat.min h v)
-    end
-  end.
 
 Lemma bubble_up_sorted_invariant : forall l,
   sorted l ->
@@ -100,41 +85,55 @@ Proof.
   - ltac1:(autorewrite with bubble_up); econstructor.
   - ltac1:(autorewrite with bubble_up); ff; econstructor;
     neqbsimpl; ff.
-    * erewrite Nat.leb_le in *; ff.
-    * erewrite Nat.leb_gt in *; ff l.
-    * econstructor.
-  - ltac1:(autorewrite with bubble_up).
-    invc H0.
-    pp (H1 H6).
-    erewrite <- Nat.leb_le in *.
-    ff; clear H H1;
-    erewrite Nat.leb_le in *.
-    * erewrite sorted_spec in *; ff.
-      split; ff l.
-      + admit.
-      + admit.
-  
+    econstructor.
+  - 
+    assert (sorted (x :: l)). {
+      repeat (erewrite sorted_spec in *; ff).
+    }
+    assert (sorted (y :: l)). {
+      repeat (erewrite sorted_spec in *; ff).
+    }
+    pp (H H2).
+    clear H.
+    pp (H1 H3).
+    clear H1.
+    setoid_rewrite bubble_up_equation_3 in H.
+    setoid_rewrite bubble_up_equation_3 in H4.
+    ltac1:(autorewrite with bubble_up in * ).
+    ff l; neqbsimpl.
+    * econstructor; ff.
+      pp (H x); ff l; neqbsimpl.
+    * 
+      assert (y <= x) by lia.
+      erewrite sorted_spec in H0; ff l.
+      pp (H0 y (or_introl eq_refl)); ff l.
+    * assert (x <= h <= y) by lia.
+      pp (bubble_up_sorted_invariant _ H3).
+      repeat (erewrite sorted_spec; split; ff l);
+      clear H H4;
+      repeat (erewrite sorted_spec in *; ff l);
+      erewrite <- bubble_up_in_same in *; ff l.
+      erewrite Heqb0.
+      ff l.
+    * pp (H4 h); ff l; neqbsimpl.
+      pp (H h); ff l; neqbsimpl.
+      econstructor; ff.
+      invc H0; ff l.
+Qed.
 
-Compute (bubble_up [3;2;1]).
+Compute (bubble_up [4; 3;2;1]).
+Compute (bubble_up [3;2;1; 4]).
+Compute (bubble_up [2;1;3; 4]).
 
 (* Now, we need to do n passes of the bubble-up procedure! *)
 
-Fixpoint do_n_times {A : Type} (f : A -> A) (l : A) (n : nat) : A :=
-  match n with
-  | 0 => l
-  | S n' => f (do_n_times f l n')
+Fixpoint bubble_sort (l : list nat) : list nat :=
+  match l with
+  | nil => nil
+  | h :: t => 
+    let l' := bubble_sort t in
+    bubble_up (h :: l')
   end.
-
-Lemma do_n_times_invariants : forall {A : Type} (P : A -> Prop) f a n,
-  (forall a', P a' -> P (f a')) ->
-  P a ->
-  P (do_n_times f a n).
-Proof.
-  induction n; ff.
-Qed.
-
-Definition bubble_sort (l : list nat) : list nat :=
-  do_n_times bubble_up l (length l).
 
 Example test1 : bubble_sort [3;2;1;0] = [0;1;2;3].
 Proof. reflexivity. Qed.
@@ -152,15 +151,11 @@ Proof.
   unfold sort_correct; intros.
   split.
   - (* is it sorted! *)
-    induction l; unfold bubble_sort in *; simpl.
+    induction l; ff.
     * econstructor.
-    * eapply do_n_times_invariants.
-      admit.
-      admit.
+    * eapply bubble_up_sorted_cons; ff.
   - (* does it have the same counts! *)
-    unfold bubble_sort.
-    eapply do_n_times_invariants; ff.
-    erewrite H.
-    eapply bubble_up_count_invariant.
-
-*)
+    induction l; ff; neqbsimpl.
+    * erewrite <- bubble_up_count_invariant; ff l; neqbsimpl.
+    * erewrite <- bubble_up_count_invariant; ff l; neqbsimpl.
+Qed.

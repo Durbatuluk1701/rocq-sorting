@@ -10,31 +10,7 @@ Equations merge (l1 l2 : list nat) : list nat by wf (length l1 + length l2) :=
 Next Obligation.
   lia.
 Defined.
-
-Program Fixpoint list_sync_ind {A : Type} (P : (list A * list A) -> Prop) 
-    (f_nil_l : forall r, P (nil, r))
-    (f_nil_r : forall l, P (l, nil))
-    (f_cons  : forall h1 h2 t1 t2, P (h1 :: t1, t2) /\ P (t1, h2 :: t2) -> P (h1 :: t1, h2 :: t2))
-    (lp : (list A * list A))
-    {measure (length (fst lp) + length (snd lp))}
-    : P lp :=
-  match lp with
-  | (nil, r) => f_nil_l r
-  | (l, nil) => f_nil_r l
-  | (h1 :: t1, h2 :: t2) => 
-    f_cons h1 h2 t1 t2 
-      (conj 
-        (list_sync_ind P f_nil_l f_nil_r f_cons (h1 :: t1, t2))
-        (list_sync_ind P f_nil_l f_nil_r f_cons (t1, h2 :: t2))
-      )
-  end.
-Next Obligation.
-  lia.
-Qed.
-Next Obligation.
-  eapply measure_wf.
-  eapply well_founded_ltof.
-Qed.
+Print Assumptions merge_equation_3.
 
 Lemma merge_in : forall l1 l2 x,
   In x (merge l1 l2) <-> In x l1 \/ In x l2.
@@ -50,13 +26,10 @@ Proof.
   - ltac1:(autorewrite with merge in * ); ff.
     * rewrite H1 in H; ff.
     * rewrite H0 in H; ff.
-    Show Proof.
-    Print Assumptions merge_equation_3.
   - ltac1:(autorewrite with merge in * ); ff.
     * erewrite H1; ff.
     * erewrite H0; ff.
 Qed.
-Print Assumptions merge_in.
 
 Theorem merge_sorted : forall l1 l2,
   sorted l1 ->
@@ -330,5 +303,3 @@ Proof.
     eapply H with (n := S (length l)).
     lia.
 Qed.
-
-Print Assumptions merge_sort_correct.
