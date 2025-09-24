@@ -4,3 +4,4 @@ Tactics.v
 SortingHeader.v
 InsertionSort.v
 MergeSort.v
+BubbleSort.v
