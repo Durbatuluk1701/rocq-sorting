@@ -1,9 +1,8 @@
-From Stdlib Require Import List Arith.
-From Sorting Require Import Tactics.
-From Corelib Require Import Program.Wf.
-From Equations Require Import Equations.
-
-Import ListNotations.
+From Stdlib Require Export List Arith.
+From Sorting Require Export Tactics.
+From Corelib Require Export Program.Wf.
+From Equations Require Export Equations.
+Export ListNotations.
 
 (* Today we will be covering sorting algorithms and proving their correctness. 
 
