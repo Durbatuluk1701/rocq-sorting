@@ -8,7 +8,7 @@ Equations merge (l1 l2 : list nat) : list nat by wf (length l1 + length l2) :=
     then h1 :: merge t1 (h2 :: t2)
     else h2 :: merge (h1 :: t1) t2.
 Next Obligation.
-  lia.
+  ff l.
 Defined.
 Print Assumptions merge_equation_3.
 
@@ -54,7 +54,7 @@ Proof.
     * erewrite merge_in in *; ff a, l.
     * erewrite merge_in in *; ff.
       break_or_hyp.
-      + lia.
+      + ff l.
       + eapply H1 in H0; ff l.
 Qed.
 
@@ -115,7 +115,7 @@ Lemma fst_split_at_n_length_lt : forall l n,
   length (fst (split_at_n l n)) = n.
 Proof.
   induction l; ff l.
-  assert (n0 < length l) by lia.
+  assert (n0 < length l) by ff l.
   eapply IHl in H0.
   ff.
 Qed.
@@ -125,7 +125,7 @@ Lemma snd_split_at_n_length_lt : forall l n,
   length (snd (split_at_n l n)) = length l - n.
 Proof.
   induction l; ff l.
-  assert (n0 < length l) by lia.
+  assert (n0 < length l) by ff l.
   eapply IHl in H0.
   ff.
 Qed.
@@ -155,13 +155,13 @@ Proof.
   Search (_ / _ < _).
   pp (Nat.div_lt (S n) 2).
   (* assert (n / 2 <= S n / 2) by admit. *)
-  eapply Nat.lt_le_trans > [ | eapply H; lia ].
+  eapply Nat.lt_le_trans > [ | eapply H; ff l ].
   clear H.
   pp (Nat.Div0.div_le_mono n (S n) 2).
-  assert (n <= S n) by lia.
+  assert (n <= S n) by ff l.
   eapply H in H0.
   clear H.
-  lia.
+  ff l.
 Qed.
 
 Show Obligation Tactic.
@@ -180,14 +180,14 @@ Next Obligation.
     erewrite H.
     erewrite add_n_div_n in *.
     pp (n_div (length l)).
-    lia.
-    lia.
+    ff l.
+    ff l.
   - assert (length (n :: n0 :: l) = 2 + (length l)) by ff.
     erewrite H.
     erewrite add_n_div_n in *.
     pp (n_div (length l)).
-    lia.
-    lia.
+    ff l.
+    ff l.
 Defined.
 Next Obligation.
   intros.
@@ -197,14 +197,14 @@ Next Obligation.
     erewrite H.
     erewrite add_n_div_n in *.
     pp (n_div (length l)).
-    lia.
-    lia.
+    ff l.
+    ff l.
   - assert (length (n :: n0 :: l) = 2 + (length l)) by ff.
     erewrite H.
     erewrite add_n_div_n in *.
     pp (n_div (length l)).
-    lia.
-    lia.
+    ff l.
+    ff l.
 Defined.
 
 Theorem merge_sort_correct : sort_correct merge_sort.
@@ -230,30 +230,30 @@ Proof.
                   erewrite H0.
                   erewrite add_n_div_n in *.
                   pp (n_div (length l)).
-                  lia.
-                  lia.
+                  ff l.
+                  ff l.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                   erewrite H0.
                   erewrite add_n_div_n in *.
                   pp (n_div (length l)).
-                  lia.
-                  lia.
+                  ff l.
+                  ff l.
             + erewrite snd_split_at_n_length_lt.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                 erewrite H0.
                 erewrite add_n_div_n in *.
                 pp (n_div (length l)).
-                lia.
-                lia.
+                ff l.
+                ff l.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                 erewrite H0.
                 erewrite add_n_div_n in *.
                 pp (n_div (length l)).
-                lia.
-                lia.
+                ff l.
+                ff l.
     }
     eapply H with (n := S (length l)).
-    lia.
+    ff l.
   - (* counting part *)
     assert (forall n : nat, forall x l, length l < n -> count x l = count x (merge_sort l)). {
       clear x l.
@@ -278,28 +278,28 @@ Proof.
                 erewrite H0.
                 erewrite add_n_div_n in *.
                 pp (n_div (length l)).
-                lia.
-                lia.
+                ff l.
+                ff l.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                 erewrite H0.
                 erewrite add_n_div_n in *.
                 pp (n_div (length l)).
-                lia.
-                lia.
+                ff l.
+                ff l.
             + erewrite fst_split_at_n_length_lt.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                   erewrite H0.
                   erewrite add_n_div_n in *.
                   pp (n_div (length l)).
-                  lia.
-                  lia.
+                  ff l.
+                  ff l.
               -- assert (length (n0 :: n1 :: l) = 2 + (length l)) by ff.
                   erewrite H0.
                   erewrite add_n_div_n in *.
                   pp (n_div (length l)).
-                  lia.
-                  lia.
+                  ff l.
+                  ff l.
     }
     eapply H with (n := S (length l)).
-    lia.
+    ff l.
 Qed.

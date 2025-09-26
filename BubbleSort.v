@@ -5,23 +5,6 @@ Local Obligation Tactic :=
   CoreTactics.equations_simpl;
   try Tactics.program_solve_wf.
 
-Program Fixpoint list_ind_two {A : Type} (P : list A -> Prop) 
-    (fnil : P nil)
-    (fsingle : forall x, P [x]) 
-    (fcons_two : forall x y l, P (x :: l) /\ P (y :: l) -> P (cons x (cons y l))) (l : list A) {measure (length l)} : P l :=
-  match l with
-  | nil => fnil
-  | [x] => fsingle x
-  | x :: y :: l => 
-    fcons_two x y l (conj 
-      (list_ind_two P fnil fsingle fcons_two (x :: l)) 
-      (list_ind_two P fnil fsingle fcons_two (y :: l)))
-  end.
-Next Obligation.
-  eapply measure_wf.
-  eapply well_founded_ltof.
-Qed.
-
 Equations bubble_up (l : list nat) : list nat by wf (length l) :=
 bubble_up nil := nil;
 bubble_up (cons x nil) := (cons x nil);
@@ -104,10 +87,10 @@ Proof.
     * econstructor; ff.
       pp (H x); ff l; neqbsimpl.
     * 
-      assert (y <= x) by lia.
+      assert (y <= x) by ff l.
       erewrite sorted_spec in H0; ff l.
       pp (H0 y (or_introl eq_refl)); ff l.
-    * assert (x <= h <= y) by lia.
+    * assert (x <= h <= y) by ff l.
       pp (bubble_up_sorted_invariant _ H3).
       repeat (erewrite sorted_spec; split; ff l);
       clear H H4;
