@@ -33,15 +33,9 @@ Proof.
       split; ff.
       pp (H1 _ H4).
       ff l.
-  - prep_induction H0.
-    induction H0; ff.
+  - destruct t.
     * econstructor.
     * econstructor; ff.
-      econstructor.
-    * assert (sorted (x :: y :: l)). {
-        econstructor; ff.
-      }
-      econstructor; ff.
 Qed.
 
 

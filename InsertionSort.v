@@ -1,30 +1,73 @@
 From Sorting Require Import SortingHeader.
 
-(** Sorting Algorithms:*)
 
+(* Insertion Sort *)
 
-(** The Algorithms *)
+(* The rough idea of insertion sort is:
+"""
+1. Take the head of the list
+2. Recursively sort the tail of the list
+3. Insert the head into the sorted tail at the appropriate position
+"""
+*)
 
+(* Lets start by defining our insertion function.
+Critically, we will *assume* that the list we are inserting into is already sorted.
+*)
 
-Fixpoint insert (x : nat) (l : list nat) : list nat :=
-  (* assumes l is already sorted *)
-  match l with
-  | nil => [x]
-  | h :: t => 
-    (* find first place where x <= h, 
-      thus it can be safely inserted and maintain sortedness
-    *)
-    if x <=? h then
-      x :: l
-    else
-      h :: insert x t
-  end.
+Fixpoint insert (x : nat) (l : list nat) : list nat.
+Admitted.
+
+(* Here is a fun way to do it with dependent types!
+
+  This ensures that the output of the function is correct, without any additional lemmas needed!
+  """
+  Definition dep_insert (x : nat) 
+      : forall il : {l : list nat | sorted l}, 
+        {l : list nat | sorted l /\ 
+          forall y, (count y (proj1_sig il) + if Nat.eqb x y then 1 else 0) = count y l }.
+    ref (
+      @Fix _ (fun l1 l2 => length (proj1_sig l1) < length (proj1_sig l2)) 
+      _
+      _
+      (fun l F =>
+      let Hsl := proj2_sig l in
+      match (proj1_sig l) as l' return (proj1_sig l) = l' -> _ with
+      | nil => fun HL => exist _ [x] (conj (sorted_singleton x) _)
+      | h :: l'' => fun HL => _
+      end eq_refl)
+    ).
+    - eapply well_founded_ltof.
+    - (* base case *)
+      ff l; neqbsimpl.
+    - destruct (x <=? h) eqn:Hle.
+      * ref (exist _ (x :: h :: l'') (conj _ _)).
+        + neqbsimpl.
+          econstructor; ff.
+        + ff l; neqbsimpl.
+      * ff. 
+        erewrite sorted_spec in Hsl.
+        destruct Hsl as [Hnl Hsl'].
+        destruct (F (exist _ l'' Hsl')) as [rl'' [Hsrl'' Hcrl'']].
+        ff.
+        ref (exist _ (h :: rl'') (conj _ _)); ff.
+        erewrite sorted_spec; split; ff; neqbsimpl; ff l.
+        pp (Hcrl'' x0).
+        ff l; neqbsimpl; ff.
+        eapply Hnl.
+        erewrite <- Permutation_Equals_Count.count_in.
+        erewrite <- Permutation_Equals_Count.count_in in H.
+        ff l.
+  Defined.
+  """
+*)
 
 Lemma insert_sorted : forall x l,
   sorted l ->
   sorted (insert x l).
 Proof.
-  intros.
+Admitted.
+  (* intros.
   prep_induction H.
   induction H; ff; neqbsimpl; try (econstructor; ff l; fail).
   - econstructor; ff l.
@@ -37,29 +80,16 @@ Proof.
     pp (IHsorted x0); ff; neqbsimpl.
   - econstructor; ff l.
     pp (IHsorted x0); ff; neqbsimpl.
-Qed.
+Qed. *)
 
 Lemma insert_count_cons : forall x y l,
   count x (insert y l) = count x l + if Nat.eqb x y then 1 else 0.
 Proof.
-  induction l; ff; neqbsimpl; ff.
-Qed.
+Admitted.
 
-Fixpoint insertion_sort (l : list nat) : list nat :=
-  match l with
-  | nil => nil
-  | h :: t => insert h (insertion_sort t)
-  end.
+Fixpoint insertion_sort (l : list nat) : list nat.
+Admitted.
 
 Theorem insertion_sort_correct : sort_correct insertion_sort.
 Proof.
-  unfold sort_correct; split; ff.
-  - (* sortedness part *)
-    induction l; ff.
-    * econstructor.
-    * eapply insert_sorted; ff.
-  - (* counting part *)
-    induction l; ff; neqbsimpl; ff.
-    * erewrite insert_count_cons; ff l; neqbsimpl.
-    * erewrite insert_count_cons; ff l; neqbsimpl.
-Qed.
+Admitted.

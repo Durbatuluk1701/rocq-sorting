@@ -16,7 +16,12 @@ Lemma merge_in : forall l1 l2 x,
   In x (merge l1 l2) <-> In x l1 \/ In x l2.
 Proof.
   intros l1 l2.
-  pp (@list_sync_ind nat (fun lp => forall x : nat, In x (merge (fst lp) (snd lp)) <-> In x (fst lp) \/ In x (snd lp))).
+  pp (@list_sync_ind nat 
+    (fun lp => 
+      forall x : nat, 
+        In x (merge (fst lp) (snd lp)) <-> 
+        In x (fst lp) \/ In x (snd lp))
+  ).
   simpl in *.
   specialize H with (lp := (l1, l2)).
   simpl in *.
@@ -37,7 +42,13 @@ Theorem merge_sorted : forall l1 l2,
   sorted (merge l1 l2).
 Proof.
   intros l1 l2.
-  pp (@list_sync_ind nat (fun lp => sorted (fst lp) -> sorted (snd lp) -> sorted (merge (fst lp) (snd lp)))).
+  pp (@list_sync_ind nat 
+    (fun lp => 
+      sorted (fst lp) -> 
+      sorted (snd lp) -> 
+      sorted (merge (fst lp) (snd lp))
+    )
+  ).
   simpl in *.
   specialize H with (lp := (l1, l2)).
   simpl in *.

@@ -5,64 +5,35 @@ Export ListNotations.
 
 (* Today we will be covering sorting algorithms and proving their correctness. 
 
-First, we must define what it means for a list to be sorted. We will use the following abstract definition: "a list is sorted if each element is less than or equal to the next element in the list."
+First, we must define what it means for a list to be sorted. We will use the following abstract definition: "FILL IN HERE"
 *)
 
-Inductive sorted : list nat -> Prop :=
-(* The empty list is sorted *)
-| sorted_nil : sorted []
-(* A single-element list is sorted *)
-| sorted_singleton : forall x, sorted [x]
-(* If the head "x" is less than or equal to the head of "y :: l" (i.e. "y"), and "y :: l" is sorted, then the whole list is sorted *)
-| sorted_cons : forall x y l, 
-    x <= y -> 
-    sorted (y :: l) -> 
-    sorted (x :: y :: l).
+Inductive sorted : list nat -> Prop :=.
 
+(* Now, lets validate our intuition with a fairly straight-forward test: "the head of any sorted list is less than or equal to any element in the tail" *)
 Theorem sorted_spec : forall h t,
   sorted (h :: t) <-> ((forall x, In x t -> h <= x) /\ sorted t).
 Proof.
-  split; ff.
-  - prep_induction H.
-    induction H; ff.
-    * split; ff.
-      econstructor.
-    * pp (IHsorted _ _ eq_refl).
-      clear IHsorted.
-      ff.
-      split; ff.
-      pp (H1 _ H4).
-      ff l.
-  - prep_induction H0.
-    induction H0; ff.
-    * econstructor.
-    * econstructor; ff.
-      econstructor.
-    * assert (sorted (x :: y :: l)). {
-        econstructor; ff.
-      }
-      econstructor; ff.
-Qed.
+Admitted.
 
 
 (* We have established what it means to be sorted, but further we need to establish an overall theorem of "correctness" for a sorting algorithm.
 It is not simply enough to say that the output list is sorted; we must also ensure that the output list is a permutation of the input list.
 
-While this is certainly viable, I want to do something a little simpler than fully defining "permutation" here. 
-Instead, we will define a function that "counts the occurrences of an element in a list", and then we will prove that the count of each element in the input list is the same as the count of that element in the output list.
+
+
+
+Instead of going directly for permutation, we will define a function that "counts the occurrences of an element in a list", and then we will prove that the count of each element in the input list is the same as the count of that element in the output list.
 *)
 
-Fixpoint count (x : nat) (l : list nat) : nat :=
-  match l with
-  | [] => 0
-  | h :: t => if Nat.eqb x h then S (count x t) else count x t
-  end.
+Fixpoint count (x : nat) (l : list nat) : nat. Admitted.
 
 Lemma count_app : forall x l1 l2,
   count x (l1 ++ l2) = count x l1 + count x l2.
 Proof.
-  induction l1; destruct l2; ff l.
-Qed.
+  (* induction l1, l2; ff.
+Qed. *)
+Admitted.
 
 Section IndPrinciples.
   (* We will need a few induction principles for lists. The standard one is not quite sufficient for our needs. *)
@@ -93,7 +64,10 @@ Section IndPrinciples.
 
   (* The induction principle itself. We will prove this by well-founded induction on the sum of the lengths of the two lists. *)
   Equations list_sync_ind_same 
-      (f_cons : forall h1 h2 t1 t2, P_pair (t1, t2) -> P_pair (h1 :: t1, h2 :: t2))
+      (f_cons : forall h1 h2 t1 t2, 
+          P_pair (t1, t2) -> 
+          P_pair (h1 :: t1, h2 :: t2)
+      )
       (lp : (list A * list A))
       : P_pair lp 
       by wf ((length (fst lp) + length (snd lp))) :=
