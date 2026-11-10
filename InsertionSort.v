@@ -5,9 +5,7 @@ From Sorting Require Import SortingHeader.
 
 (* The rough idea of insertion sort is:
 """
-1. Take the head of the list
-2. Recursively sort the tail of the list
-3. Insert the head into the sorted tail at the appropriate position
+...
 """
 *)
 

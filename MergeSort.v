@@ -1,5 +1,16 @@
 From Sorting Require Import SortingHeader.
 
+(* *Merge Sort* *)
+
+(*
+
+The idea of merge sort is:
+"""
+...
+"""
+
+*)
+
 Equations merge (l1 l2 : list nat) : list nat by wf (length l1 + length l2) :=
   merge nil l2 := l2;
   merge l1 nil := l1;
